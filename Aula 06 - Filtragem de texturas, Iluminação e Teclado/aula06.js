@@ -28,61 +28,62 @@ initializeScene();
 // Anima a cena
 animateScene();
 
-/**
- * Initialze the scene.
- */
- function initializeScene(){
-      webGLAvailable = false; 
-     // Verifica se o browser suporta o webGL
-     if(Detector.webgl){
-         renderer = new THREE.WebGLRenderer({antialias:true});
+function initializeScene() {
+    webGLAvailable = false;
 
-     // Se não é suportado, instancia o renderizador de canvas, que é suportado em todos os navegadores
-     } else {
-         renderer = new THREE.CanvasRenderer();
-     }
+    // Verifica se o browser suporta o webGL
+    if (Detector.webgl) {
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
 
-     // Define a cor de fundo para preto, com opacidade total
-     renderer.setClearColor(0x000000, 1);
+        // Se não é suportado, instancia o renderizador de canvas, que é suportado em todos os navegadores
+    } else {
+        renderer = new THREE.CanvasRenderer();
+    }
 
-     // Obtem o tamanho da area de conteudo para renderizar com o tamanho total da janela
-     canvasWidth = window.innerWidth;
-     canvasHeight = window.innerHeight;
+    // Define a cor de fundo para preto, com opacidade total
+    renderer.setClearColor(0x000000, 1);
 
-     // Define o tamanho da área de conteúdo
-     renderer.setSize(canvasWidth, canvasHeight);
+    // Obtem o tamanho da area de conteudo para renderizar com o tamanho total da janela
+    canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight;
 
-     // Obtem o elemento DIV a partir do documento HTML pelo seu ID e anexa o renderer a ele
-     document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
+    // Define o tamanho da área de conteúdo
+    renderer.setSize(canvasWidth, canvasHeight);
 
-     // Cria a cena, onde todos os objetos estão armazenados (camera, luzes, geometrias)
-     scene = new THREE.Scene();
+    // Obtem o elemento DIV a partir do documento HTML pelo seu ID e anexa o renderer a ele
+    document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
 
-     // Definir e adicionar a câmera à cena.
-     camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
-     camera.position.set(0, 0, 10);
-     camera.lookAt(scene.position);
-     scene.add(camera);
+    // Cria a cena, onde todos os objetos estão armazenados (camera, luzes, geometrias)
+    scene = new THREE.Scene();
+
+    // Definir e adicionar a câmera à cena.
+    camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
+    camera.position.set(0, 0, 10);
+    camera.lookAt(scene.position);
+    scene.add(camera);
+
 
     // Cria o cubo
     var boxGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
-    // Load an image as texture
-    crateTexture = new THREE.ImageUtils.loadTexture("crate.gif");
+    // Carrega a imagem
+    crateTexture = new THREE.TextureLoader().load("crate.gif");
 
-    // Create a material, which contains the texture.
+    // Cria um basic material utilizando uma textura e ativa o atributo `doubleSided'. Para ativar a cor do vértice, é necessário definir o atributo 'vertexColors' com 'THREE.VertexColors'.
     var boxMaterial = new THREE.MeshLambertMaterial({
-        map:crateTexture,
-        side:THREE.DoubleSide
+        map: crateTexture,
+        side: THREE.DoubleSide
     });
 
     // Infelizmente, o CanvasRenderer não suporta MeshLambertMaterial em combinação com texturas.
     // Por outro lado, o MeshBasicMaterial não suporta iluminação.
     // O CanvasRenderer irá mostrar a textura sem iluminação via MeshBasicMaterial
-    if(!webGLAvailable){
+    if (!webGLAvailable) {
         boxMaterial = new THREE.MeshBasicMaterial({
-            map:crateTexture,
-            side:THREE.DoubleSide
+            map: crateTexture,
+            side: THREE.DoubleSide
         });
     }
 
@@ -96,25 +97,26 @@ animateScene();
     scene.add(ambientLight);
 
     // A luz direcional tem uma fonte e brilha em todas as direções, como o sol.
+
     // Esse comportamento cria efeitos de sombreamento.
     directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
     directionalLight.position.set(0.0, 0.0, 1.0);
     scene.add(directionalLight);
 
     // Cria um listener para o pressionamento de um botão no teclado ('keydown' events).
+
     // Este listener envia todos as teclas pressionadas para a função 'onDocumentKeyDown'.
     document.addEventListener("keydown", onDocumentKeyDown, false);
 }
 
+function onDocumentKeyDown(event) {
 
- // Esta função é chamada, quando uma tecla é pressionada.
-function onDocumentKeyDown(event){
     // Obtem o código da tecla pressionada
     var keyCode = event.which;
 
     // 'F' - Alterna entre dos filtros de textura
-    if(keyCode == 70){
-        switch(textureFilter){
+    if (keyCode == 70) {
+        switch (textureFilter) {
             case 0:
                 crateTexture.minFilter = THREE.NearestFilter;
                 crateTexture.magFilter = THREE.NearestFilter;
@@ -133,61 +135,59 @@ function onDocumentKeyDown(event){
         };
         crateTexture.needsUpdate = true;
 
-    // 'L' - Alterna entre as luzes
-    } else if(keyCode == 76){
+        // 'L' - Alterna entre as luzes
+    } else if (keyCode == 76) {
+
         // Se as luzes da cena forem removidas, não seria possivel ver o cubo pois a cena ficaria escura. Isto ocorre devido ao `MeshLambertMaterial', pois este necessita de luz.
-        if(lightIsOn){
+        if (lightIsOn) {
             boxMesh.material = new THREE.MeshBasicMaterial({
-                map:crateTexture,
-                side:THREE.DoubleSide
+                map: crateTexture,
+                side: THREE.DoubleSide
             });
             lightIsOn = false;
         } else {
-            if(webGLAvailable){
+            if (webGLAvailable) {
                 boxMesh.material = new THREE.MeshLambertMaterial({
-                    map:crateTexture,
-                    side:THREE.DoubleSide
+                    map: crateTexture,
+                    side: THREE.DoubleSide
                 });
             } else {
                 boxMesh.material = new THREE.MeshBasicMaterial({
-                    map:crateTexture,
-                    side:THREE.DoubleSide
+                    map: crateTexture,
+                    side: THREE.DoubleSide
                 });
             }
             lightIsOn = true;
         }
         boxMesh.material.needsUpdate = true;
 
-    // Seta para cima
-    } else if(keyCode == 38){
+        // Seta para cima
+    } else if (keyCode == 38) {
         xSpeed -= 0.01;
 
-    // Seta para baixo
-    } else if(keyCode == 40){
+        // Seta para baixo
+    } else if (keyCode == 40) {
         xSpeed += 0.01;
 
-    // Seta para a esquerda
-    } else if(keyCode == 37){
+        // Seta para a esquerda
+    } else if (keyCode == 37) {
         ySpeed -= 0.01;
 
-    // Seta para a direita
-    } else if(keyCode == 39){
+        // Seta para a direita
+    } else if (keyCode == 39) {
         ySpeed += 0.01;
 
-    // Page up
-    } else if(keyCode == 33){
+        // Page up
+    } else if (keyCode == 33) {
         zTranslation -= 0.2;
 
-    // Page down
-    } else if(keyCode == 34){
+        // Page down
+    } else if (keyCode == 34) {
         zTranslation += 0.2;
     }
 }
 
-/**
- * Animate the scene and call rendering.
- */
-function animateScene(){
+function animateScene() {
     directionalLight.position = camera.position;
 
     // Atualiza a rotação no eixo x e y
@@ -198,18 +198,14 @@ function animateScene(){
     // Aplica a translação ao longo do eixo z
     boxMesh.position.z = zTranslation;
 
-    // Define the function, which is called by the browser supported timer loop. If the
-    // browser tab is not visible, the animation is paused. So 'animateScene()' is called
-    // in a browser controlled loop.
+    // Define a função que é executada pelo browser. Se a aba não está visível, a animação é pausada.
     requestAnimationFrame(animateScene);
 
-    // Map the 3D scene down to the 2D screen (render the frame)
+    // Renderiza a cena
     renderScene();
 }
 
-/**
- * Render the scene. Map the 3D world to the 2D screen.
- */
-function renderScene(){
+// Função para renderizar a cena
+function renderScene() {
     renderer.render(scene, camera);
 }

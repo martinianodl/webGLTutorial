@@ -37,7 +37,7 @@ function initializeScene(){
   // Cria a cena, onde todos os objetos serão armazenados (câmera, luzes, geometrias)
   scene = new THREE.Scene();
 
-  // Define e adiciona a câmera à cena.
+  // Definir e adicionar a câmera à cena.
   camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
   camera.position.set(0, 0, 10);
   camera.lookAt(scene.position);
@@ -50,18 +50,24 @@ function initializeScene(){
   triangleGeometry.vertices.push(new THREE.Vector3( 1.0, -1.0, 0.0));
   triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
 
-  // Cria um basic material branco e ativa o atributo 'doubleSided'.
+  // Para colorir a superfície, um material tem que ser criado. É preciso definir as cores dos vértices de cada face. Se todos os vértices tiverem cores diferentes, as cores entre os vértices serão interpoladas como gradientes de cor.
+  triangleGeometry.faces[0].vertexColors[0] = new THREE.Color(0xFF0000);
+  triangleGeometry.faces[0].vertexColors[1] = new THREE.Color(0x00FF00);
+  triangleGeometry.faces[0].vertexColors[2] = new THREE.Color(0x0000FF);
+
+
+  // Cria um basic material utilizando as cores dos vertices e ativa o atributo 'doubleSided'. Para ativar a cor do vértice, é necessário definir o atributo 'vertexColors' com 'THREE.VertexColors'. Caso contrário, não será exibida nenhuma cor.
   var triangleMaterial = new THREE.MeshBasicMaterial({
-    color:0xFFFFFF,
+    vertexColors:THREE.VertexColors,
     side:THREE.DoubleSide
   });
 
-  // Cria uma malha e insere a geometria do objeto, e o basic material (cor). A malha é transladada em -1,5 no eixo X e 4 no eixo Z. Finalmente é adicionada a malha à cena.
+  // Cria uma malha e insere a geometria do objeto, e o basic material (cor). Translada toda a malha por -1,5 no eixo X e 4 no eixo Z. Finalmente adiciona a malha na cena.
   var triangleMesh = new THREE.Mesh(triangleGeometry, triangleMaterial);
   triangleMesh.position.set(-1.5, 0.0, 4.0);
   scene.add(triangleMesh);
 
-  // A criação do quadrado é feita da mesma maneira que o triângulo, com exceção da definição das faces. Ao invés de um, temos que definir dois THREE.Face3.
+  // A criação do quadrado é feita da mesma maneira que o triângulo, com excepção da definição das faces. Ao inves de um, temos que definir dois THREE.Face3.
   var squareGeometry = new THREE.Geometry();
   squareGeometry.vertices.push(new THREE.Vector3(-1.0,  1.0, 0.0));
   squareGeometry.vertices.push(new THREE.Vector3( 1.0,  1.0, 0.0));
@@ -70,13 +76,13 @@ function initializeScene(){
   squareGeometry.faces.push(new THREE.Face3(0, 1, 2));
   squareGeometry.faces.push(new THREE.Face3(0, 2, 3));
 
-  // Cria um basic material branco e ativa o atributo 'doubleSided'.
+  // Cria um basic material com uma cor sólida e ativa o atributo 'doubleSided'. No quadrado não será definido cores para os vértices.
   var squareMaterial = new THREE.MeshBasicMaterial({
-    color:0xFFFFFF,
+    color:0x8080FF,
     side:THREE.DoubleSide
   });
 
-  // Cria uma malha e insere a geometria do objeto, e o basic material (cor). A malha é transladada em +1,5 no eixo X e 4 no eixo Z. Finalmente é adicionada a malha à cena.
+  // Cria uma malha e insere a geometria do objeto, e o basic material (cor). Translada toda a malha por +1,5 no eixo X e 4 no eixo Z. Finalmente adiciona a malha na cena.
   var squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
   squareMesh.position.set(1.5, 0.0, 4.0);
   scene.add(squareMesh);
